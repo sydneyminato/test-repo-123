@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GITHUB REGISTRATOR</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0a0a0f;--panel:#0f0f1a;--border:#1a1a2e;
+    --cyan:#00f5ff;--green:#39ff14;--purple:#bf00ff;
+    --orange:#ff6600;--pink:#ff6ec7;--red:#ff003c;--yellow:#ffe600;
+    --text:#c0c0d0;--dim:#505060;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:'Share Tech Mono',monospace;min-height:100vh;}
+  body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,245,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,245,255,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+  header{position:relative;z-index:1;display:flex;align-items:center;gap:16px;padding:16px 24px;border-bottom:1px solid var(--border);background:rgba(15,15,26,0.95);}
+  .logo{font-family:'Orbitron',sans-serif;font-size:14px;font-weight:900;color:var(--cyan);letter-spacing:4px;}
+  .logo span{color:var(--green);}
+  .htag{font-size:10px;color:var(--dim);letter-spacing:2px;border:1px solid var(--border);padding:2px 8px;}
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 2s infinite;margin-left:auto;}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+  main{position:relative;z-index:1;max-width:720px;margin:32px auto;padding:0 24px 60px;}
+  .slabel{font-size:10px;color:var(--cyan);letter-spacing:3px;margin-bottom:8px;opacity:0.7;}
+  .card{background:var(--panel);border:1px solid var(--border);padding:24px;margin-bottom:16px;position:relative;}
+  .card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;}
+  .c-cyan::before{background:var(--cyan);box-shadow:0 0 8px var(--cyan);}
+  .c-green::before{background:var(--green);box-shadow:0 0 8px var(--green);}
+  .c-purple::before{background:var(--purple);box-shadow:0 0 8px var(--purple);}
+  .c-orange::before{background:var(--orange);box-shadow:0 0 8px var(--orange);}
+  .c-pink::before{background:var(--pink);box-shadow:0 0 8px var(--pink);}
+  .ctitle{font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;margin-bottom:20px;}
+  .c-cyan .ctitle{color:var(--cyan);}.c-green .ctitle{color:var(--green);}
+  .c-purple .ctitle{color:var(--purple);}.c-orange .ctitle{color:var(--orange);}
+  .c-pink .ctitle{color:var(--pink);}
+  .field{margin-bottom:16px;}
+  .flabel{display:block;font-size:10px;color:var(--dim);letter-spacing:2px;margin-bottom:6px;text-transform:uppercase;}
+  input[type="text"],input[type="password"],textarea,select{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:13px;padding:10px 12px;outline:none;transition:border-color .2s,box-shadow .2s;}
+  input:focus,textarea:focus,select:focus{border-color:var(--cyan);box-shadow:0 0 0 1px var(--cyan);}
+  textarea{resize:vertical;min-height:80px;line-height:1.6;}
+  select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M0 0l6 8 6-8z' fill='%2300f5ff'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;}
+  select option{background:var(--bg);}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .tgl-group{display:flex;}
+  .tgl-btn{flex:1;padding:8px;background:var(--bg);border:1px solid var(--border);color:var(--dim);font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:2px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+  .tgl-btn:first-child{border-right:none;}
+  .tgl-btn.active{background:rgba(0,245,255,0.1);border-color:var(--cyan);color:var(--cyan);}
+  .tags-wrap{display:flex;flex-wrap:wrap;gap:6px;min-height:42px;background:var(--bg);border:1px solid var(--border);padding:8px;cursor:text;transition:border-color .2s;}
+  .tags-wrap:focus-within{border-color:var(--cyan);}
+  .tag{display:flex;align-items:center;gap:4px;background:rgba(0,245,255,0.1);border:1px solid rgba(0,245,255,0.3);color:var(--cyan);font-size:11px;padding:2px 8px;}
+  .tag-x{cursor:pointer;color:var(--dim);}
+  .tag-x:hover{color:var(--red);}
+  .tag-inp{flex:1;min-width:80px;background:transparent;border:none;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:13px;outline:none;}
+  .twrap{position:relative;}
+  .twrap input{padding-right:60px;}
+  .tshow{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:9px;color:var(--dim);letter-spacing:1px;cursor:pointer;}
+  .tshow:hover{color:var(--cyan);}
+  .chk-item{display:flex;align-items:center;gap:10px;cursor:pointer;font-size:12px;user-select:none;margin-bottom:8px;}
+  .chk-item input{display:none;}
+  .chk-box{width:16px;height:16px;border:1px solid var(--border);background:var(--bg);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;}
+  .chk-item input:checked ~ .chk-box{border-color:var(--green);background:rgba(57,255,20,0.1);}
+  .chk-item input:checked ~ .chk-box::after{content:'✓';font-size:11px;color:var(--green);}
+  .file-btn{display:inline-block;padding:10px 20px;background:var(--bg);border:1px solid var(--orange);color:var(--orange);font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:2px;cursor:pointer;transition:all .2s;margin-bottom:12px;}
+  .file-btn:hover{background:rgba(255,102,0,0.1);}
+  .drop-area{border:2px dashed var(--border);background:var(--bg);padding:24px;text-align:center;transition:all .2s;margin-bottom:12px;font-size:11px;color:var(--dim);letter-spacing:1px;}
+  .drop-area.over{border-color:var(--orange);background:rgba(255,102,0,0.05);color:var(--orange);}
+  .file-list{display:flex;flex-direction:column;gap:4px;}
+  .file-item{display:flex;align-items:center;justify-content:space-between;background:rgba(255,102,0,0.05);border:1px solid rgba(255,102,0,0.2);padding:6px 10px;font-size:11px;}
+  .file-name{color:var(--orange);}.file-size{color:var(--dim);font-size:10px;}
+  .file-del{cursor:pointer;color:var(--dim);padding:0 4px;}
+  .file-del:hover{color:var(--red);}
+  .deploy-opts{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;}
+  .dopt{padding:12px 8px;border:1px solid var(--border);background:var(--bg);text-align:center;cursor:pointer;transition:all .2s;font-size:11px;letter-spacing:1px;color:var(--dim);}
+  .dopt:hover{border-color:var(--pink);color:var(--pink);}
+  .dopt.sel{border-color:var(--pink);color:var(--pink);background:rgba(255,110,199,0.08);}
+  .dopt-icon{font-size:20px;margin-bottom:6px;}
+  .exec-btn{width:100%;padding:18px;background:transparent;border:2px solid var(--cyan);color:var(--cyan);font-family:'Orbitron',sans-serif;font-size:13px;font-weight:900;letter-spacing:6px;cursor:pointer;position:relative;overflow:hidden;transition:all .3s;margin-top:24px;}
+  .exec-btn::before{content:'';position:absolute;inset:0;background:var(--cyan);transform:translateX(-100%);transition:transform .3s;}
+  .exec-btn:hover::before{transform:translateX(0);}
+  .exec-btn:hover{color:var(--bg);}
+  .exec-btn span{position:relative;z-index:1;}
+  .exec-btn:disabled{opacity:.3;cursor:not-allowed;}
+  .exec-btn:disabled::before{display:none;}
+  .log{margin-top:16px;background:var(--bg);border:1px solid var(--border);padding:16px;font-size:11px;line-height:1.8;max-height:200px;overflow-y:auto;display:none;}
+  .log.show{display:block;}
+  .li{margin-bottom:2px;}
+  .li.info{color:var(--cyan);}.li.ok{color:var(--green);}.li.err{color:var(--red);}.li.warn{color:var(--yellow);}.li.dim{color:var(--dim);}
+  .result{margin-top:16px;padding:20px;background:rgba(57,255,20,0.05);border:1px solid var(--green);display:none;}
+  .result.show{display:block;}
+  .result-title{color:var(--green);font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:3px;margin-bottom:12px;}
+  .result-row{margin-top:8px;}
+  .result-label{font-size:10px;color:var(--dim);margin-bottom:4px;}
+  .result-url{color:var(--green);font-size:13px;word-break:break-all;text-decoration:none;}
+  .result-url:hover{text-decoration:underline;}
+  ::-webkit-scrollbar{width:4px;}
+  ::-webkit-scrollbar-track{background:var(--bg);}
+  ::-webkit-scrollbar-thumb{background:var(--border);}
+  .skip-box{margin-bottom:20px;padding:14px 16px;border:1px solid rgba(255,230,0,0.3);background:rgba(255,230,0,0.04);}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">GITHUB <span>REGISTRATOR</span></div>
+  <div class="htag">v2.0.0</div>
+  <div class="htag">CLI-FREE</div>
+  <div class="dot"></div>
+</header>
+<main>
+  <div class="skip-box">
+    <label class="chk-item" style="margin-bottom:0;">
+      <input type="checkbox" id="skipGitHub" onchange="onSkipChange()">
+      <div class="chk-box"></div>
+      <span id="skip-label" style="color:var(--dim);letter-spacing:1px;">GitHubをスキップして Vercel のみにデプロイする</span>
+    </label>
+  </div>
+
+  <div class="slabel" id="sec-auth-label">// AUTHENTICATION</div>
+  <div class="card c-cyan" id="sec-auth-card">
+    <div class="ctitle">01 — ACCESS TOKEN</div>
+    <div class="field">
+      <label class="flabel">GitHub Personal Access Token</label>
+      <div class="twrap">
+        <input type="password" id="token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+        <span class="tshow" onclick="togglePw('token',this)">SHOW</span>
+      </div>
+    </div>
+    <div class="field">
+      <label class="flabel">GitHub Username</label>
+      <input type="text" id="username" placeholder="your-username">
+    </div>
+  </div>
+
+  <div class="slabel" id="sec-repo-label">// REPOSITORY</div>
+  <div class="card c-green" id="sec-repo-card">
+    <div class="ctitle">02 — BASIC INFO</div>
+    <div class="field">
+      <label class="flabel">Repository Name</label>
+      <input type="text" id="repoName" placeholder="my-awesome-app">
+    </div>
+    <div class="field">
+      <label class="flabel">Description</label>
+      <input type="text" id="description" placeholder="A short description of your project">
+    </div>
+    <div class="row">
+      <div class="field">
+        <label class="flabel">Visibility</label>
+        <div class="tgl-group">
+          <button class="tgl-btn active" onclick="setVis('public',this)">PUBLIC</button>
+          <button class="tgl-btn" onclick="setVis('private',this)">PRIVATE</button>
+        </div>
+      </div>
+      <div class="field">
+        <label class="flabel">License</label>
+        <select id="license">
+          <option value="mit">MIT</option>
+          <option value="apache-2.0">Apache 2.0</option>
+          <option value="gpl-3.0">GPL 3.0</option>
+          <option value="bsd-2-clause">BSD 2-Clause</option>
+          <option value="unlicense">Unlicense</option>
+          <option value="">None</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label class="flabel">Topics / Tags（Enterで追加）</label>
+      <div class="tags-wrap" id="tagsWrap" onclick="document.getElementById('tagInp').focus()">
+        <input type="text" class="tag-inp" id="tagInp" placeholder="javascript, music, webapp...">
+      </div>
+    </div>
+    <div class="field">
+      <label class="flabel">Options</label>
+      <label class="chk-item">
+        <input type="checkbox" id="addReadme" checked>
+        <div class="chk-box"></div>
+        <span>README.md を追加する</span>
+      </label>
+    </div>
+  </div>
+
+  <div class="slabel" id="sec-readme-label">// README</div>
+  <div class="card c-purple" id="sec-readme-card">
+    <div class="ctitle">03 — README CONTENT</div>
+    <div class="field">
+      <label class="flabel">README.md</label>
+      <textarea id="readme" placeholder="# My App&#10;&#10;Description here..."></textarea>
+    </div>
+    <button class="tgl-btn" style="width:auto;padding:8px 16px;border:1px solid var(--purple);color:var(--purple);" onclick="genReadme()">⚡ 説明文からAI生成</button>
+  </div>
+
+  <div class="slabel">// FILES</div>
+  <div class="card c-orange">
+    <div class="ctitle">04 — FILE UPLOAD</div>
+    <div class="field">
+      <label class="flabel">アップロードするファイル（複数可）</label>
+      <button class="file-btn" type="button" onclick="document.getElementById('fileInp').click()">⬆ ファイルを選択する</button>
+      <input type="file" id="fileInp" multiple style="display:none;" onchange="handleFiles(this.files)">
+      <div class="drop-area" id="dropArea">ここにファイルをドラッグ＆ドロップ</div>
+      <div class="file-list" id="fileList"></div>
+    </div>
+  </div>
+
+  <div class="slabel">// DEPLOY</div>
+  <div class="card c-pink">
+    <div class="ctitle">05 — DEPLOY TARGET</div>
+    <div class="deploy-opts">
+      <div class="dopt" onclick="setDeploy('none',this)"><div class="dopt-icon">—</div>NONE</div>
+      <div class="dopt" id="dopt-pages" onclick="setDeploy('pages',this)"><div class="dopt-icon">◈</div>GITHUB PAGES</div>
+      <div class="dopt" id="dopt-vercel" onclick="setDeploy('vercel',this)"><div class="dopt-icon">▲</div>VERCEL</div>
+      <div class="dopt sel" id="dopt-both" onclick="setDeploy('both',this)"><div class="dopt-icon">⬡</div>BOTH</div>
+    </div>
+    <div id="vercelFields" style="display:none;">
+      <div class="field">
+        <label class="flabel">Vercel Access Token</label>
+        <div class="twrap">
+          <input type="password" id="vercelToken" placeholder="xxxxxxxxxxxxxxxxxxxxxxxx">
+          <span class="tshow" onclick="togglePw('vercelToken',this)">SHOW</span>
+        </div>
+      </div>
+      <div class="field">
+        <label class="flabel">Vercel Team ID（任意）</label>
+        <input type="text" id="vercelTeamId" placeholder="team_xxxxxxxxx（省略可）">
+      </div>
+    </div>
+  </div>
+
+  <button class="exec-btn" id="execBtn" onclick="execute()"><span>⬡ EXECUTE REGISTRATION</span></button>
+  <div class="log" id="logPanel"></div>
+  <div class="result" id="resultPanel">
+    <div class="result-title">✓ COMPLETE</div>
+    <div class="result-row" id="r-repo" style="display:none;"><div class="result-label">REPOSITORY URL</div><a class="result-url" id="r-repo-url" href="#" target="_blank"></a></div>
+    <div class="result-row" id="r-pages" style="display:none;"><div class="result-label">PAGES URL</div><a class="result-url" id="r-pages-url" href="#" target="_blank"></a></div>
+    <div class="result-row" id="r-vercel" style="display:none;"><div class="result-label">VERCEL URL</div><a class="result-url" id="r-vercel-url" href="#" target="_blank"></a></div>
+  </div>
+</main>
+
+<script>
+let visibility='public',deploy='pages',tags=[],files=[];
+
+function onSkipChange(){
+  const skip=document.getElementById('skipGitHub').checked;
+  const ids=['sec-auth-label','sec-auth-card','sec-repo-label','sec-repo-card','sec-readme-label','sec-readme-card'];
+  ids.forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){el.style.opacity=skip?'0.3':'1';el.style.pointerEvents=skip?'none':'auto';}
+  });
+  document.getElementById('skip-label').style.color=skip?'var(--yellow)':'var(--dim)';
+  if(skip) setDeploy('vercel',document.getElementById('dopt-vercel'));
+  if(!skip) setDeploy('both',document.getElementById('dopt-both'));
+}
+
+function setVis(val,btn){
+  visibility=val;
+  btn.parentElement.querySelectorAll('.tgl-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function setDeploy(val,el){
+  deploy=val;
+  document.querySelectorAll('.dopt').forEach(d=>d.classList.remove('sel'));
+  el.classList.add('sel');
+  document.getElementById('vercelFields').style.display=(val==='vercel'||val==='both')?'block':'none';
+}
+
+function togglePw(id,btn){
+  const inp=document.getElementById(id);
+  inp.type=inp.type==='password'?'text':'password';
+  btn.textContent=inp.type==='password'?'SHOW':'HIDE';
+}
+
+document.getElementById('tagInp').addEventListener('keydown',function(e){
+  if(e.key==='Enter'||e.key===','){
+    e.preventDefault();
+    const v=this.value.trim().replace(/,$/,'');
+    if(v&&!tags.includes(v)){tags.push(v);renderTags();}
+    this.value='';
+  } else if(e.key==='Backspace'&&!this.value&&tags.length){tags.pop();renderTags();}
+});
+
+function renderTags(){
+  const wrap=document.getElementById('tagsWrap');
+  wrap.querySelectorAll('.tag').forEach(t=>t.remove());
+  const inp=document.getElementById('tagInp');
+  tags.forEach((t,i)=>{
+    const el=document.createElement('div');
+    el.className='tag';
+    el.innerHTML=`${t}<span class="tag-x" onclick="rmTag(${i})">×</span>`;
+    wrap.insertBefore(el,inp);
+  });
+}
+function rmTag(i){tags.splice(i,1);renderTags();}
+
+function handleFiles(fl){
+  const arr = Array.from(fl);
+  for(let i=0; i<arr.length; i++){
+    let f = arr[i];
+    // HTMLファイルが1つだけの場合はindex.htmlに自動リネーム
+    if(f.name.endsWith('.html') && arr.length===1){
+      f = new File([f], 'index.html', {type:f.type});
+      console.log('Auto-renamed to index.html');
+    }
+    if(!files.find(x=>x.name===f.name)) files.push(f);
+  }
+  renderFiles();
+}
+function renderFiles(){
+  const list=document.getElementById('fileList');list.innerHTML='';
+  files.forEach((f,i)=>{
+    const sz=f.size<1024?f.size+'B':f.size<1048576?(f.size/1024).toFixed(1)+'KB':(f.size/1048576).toFixed(1)+'MB';
+    const el=document.createElement('div');el.className='file-item';
+    el.innerHTML=`<span class="file-name">📄 ${f.name}</span><span class="file-size">${sz}</span><span class="file-del" onclick="rmFile(${i})">×</span>`;
+    list.appendChild(el);
+  });
+}
+function rmFile(i){files.splice(i,1);renderFiles();}
+
+const da=document.getElementById('dropArea');
+da.addEventListener('dragover',e=>{e.preventDefault();da.classList.add('over');});
+da.addEventListener('dragleave',()=>da.classList.remove('over'));
+da.addEventListener('drop',e=>{e.preventDefault();da.classList.remove('over');handleFiles(e.dataTransfer.files);});
+
+async function genReadme(){
+  const name=document.getElementById('repoName').value||'My Project';
+  const desc=document.getElementById('description').value||'';
+  const ta=document.getElementById('readme');
+  ta.value='// GENERATING...';
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:`Create a clean README.md for GitHub.\nName: ${name}\nDescription: ${desc}\nTopics: ${tags.join(', ')}\nOutput only markdown, no explanation.`}]})});
+    const d=await res.json();ta.value=d.content[0].text;
+  }catch(e){ta.value=`# ${name}\n\n${desc}\n\n## Usage\n\n...\n\n## License\n\nMIT`;}
+}
+
+function log(msg,type='info'){
+  const p=document.getElementById('logPanel');p.classList.add('show');
+  const d=document.createElement('div');d.className=`li ${type}`;d.textContent=`> ${msg}`;
+  p.appendChild(d);p.scrollTop=p.scrollHeight;
+}
+function clearAll(){
+  const p=document.getElementById('logPanel');p.innerHTML='';p.classList.remove('show');
+  document.getElementById('resultPanel').classList.remove('show');
+  ['r-repo','r-pages','r-vercel'].forEach(id=>document.getElementById(id).style.display='none');
+}
+function toBase64(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(file);});}
+function toText(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsText(file);});}
+
+async function execute(){
+  clearAll();
+  const skip=document.getElementById('skipGitHub').checked;
+  const token=document.getElementById('token').value.trim();
+  const username=document.getElementById('username').value.trim();
+  const repoName=document.getElementById('repoName').value.trim();
+  const description=document.getElementById('description').value.trim();
+  const addReadme=document.getElementById('addReadme').checked;
+  const readme=document.getElementById('readme').value;
+  const vercelToken=document.getElementById('vercelToken').value.trim();
+  const vercelTeamId=document.getElementById('vercelTeamId').value.trim();
+
+  if(!skip){
+    if(!token){log('ERROR: GitHub Token is required','err');return;}
+    if(!username){log('ERROR: Username is required','err');return;}
+    if(!repoName){log('ERROR: Repository Name is required','err');return;}
+  }
+  if((deploy==='vercel'||deploy==='both')&&!vercelToken){log('ERROR: Vercel Token is required','err');return;}
+
+  const btn=document.getElementById('execBtn');btn.disabled=true;
+  try{
+    let repoUrl=null,pagesUrl=null,vercelUrl=null;
+    if(!skip){
+      log(`Creating repository: ${repoName}`);
+      const r1=await fetch('https://api.github.com/user/repos',{method:'POST',headers:{'Authorization':`Bearer ${token}`,'Content-Type':'application/json','Accept':'application/vnd.github+json'},body:JSON.stringify({name:repoName,description,private:visibility==='private',auto_init:false})});
+      if(!r1.ok){
+        const e=await r1.json();
+        if(e.errors&&e.errors[0]&&e.errors[0].message&&e.errors[0].message.includes('already exists')){
+          log(`Repository already exists, updating...`,'warn');
+          repoUrl=`https://github.com/${username}/${repoName}`;
+        } else {
+          log(`ERROR: ${e.message}`,'err');btn.disabled=false;return;
+        }
+      } else {
+        const repo=await r1.json();repoUrl=repo.html_url;
+        log(`Repository created: ${repoUrl}`,'ok');
+      }
+      if(addReadme&&readme){
+        log('Adding README.md...','dim');
+        const content=btoa(unescape(encodeURIComponent(readme)));
+        // 既存READMEのSHAを取得（上書きに必要）
+        let readmeSha=null;
+        try{
+          const er=await fetch(`https://api.github.com/repos/${username}/${repoName}/contents/README.md`,{headers:{'Authorization':`Bearer ${token}`,'Accept':'application/vnd.github+json'}});
+          if(er.ok){const erd=await er.json();readmeSha=erd.sha;}
+        }catch(e){}
+        const readmeBody={message:'Update README.md',content};
+        if(readmeSha) readmeBody.sha=readmeSha;
+        await fetch(`https://api.github.com/repos/${username}/${repoName}/contents/README.md`,{method:'PUT',headers:{'Authorization':`Bearer ${token}`,'Content-Type':'application/json','Accept':'application/vnd.github+json'},body:JSON.stringify(readmeBody)});
+        log('README.md added','ok');
+      }
+      if(tags.length>0){
+        await fetch(`https://api.github.com/repos/${username}/${repoName}/topics`,{method:'PUT',headers:{'Authorization':`Bearer ${token}`,'Content-Type':'application/json','Accept':'application/vnd.github.mercy-preview+json'},body:JSON.stringify({names:tags})});
+        log('Topics set','ok');
+      }
+      if(files.length>0){
+        log(`Uploading ${files.length} file(s)...`);
+        for(const f of files){
+          const content=await toBase64(f);
+          // 既存ファイルのSHAを取得（上書きに必要）
+          let sha=null;
+          try{
+            const existing=await fetch(`https://api.github.com/repos/${username}/${repoName}/contents/${f.name}`,{headers:{'Authorization':`Bearer ${token}`,'Accept':'application/vnd.github+json'}});
+            if(existing.ok){const ed=await existing.json();sha=ed.sha;}
+          }catch(e){}
+          const body={message:`Update ${f.name}`,content};
+          if(sha) body.sha=sha;
+          const r=await fetch(`https://api.github.com/repos/${username}/${repoName}/contents/${f.name}`,{method:'PUT',headers:{'Authorization':`Bearer ${token}`,'Content-Type':'application/json','Accept':'application/vnd.github+json'},body:JSON.stringify(body)});
+          log(r.ok?`Uploaded: ${f.name}`:`Warning: ${f.name} failed`,r.ok?'ok':'warn');
+        }
+      }
+      if(deploy==='pages'||deploy==='both'){
+        log('Enabling GitHub Pages...','dim');
+        await new Promise(r=>setTimeout(r,1500));
+        const rp=await fetch(`https://api.github.com/repos/${username}/${repoName}/pages`,{method:'POST',headers:{'Authorization':`Bearer ${token}`,'Content-Type':'application/json','Accept':'application/vnd.github+json'},body:JSON.stringify({source:{branch:'main',path:'/'}})});
+        if(rp.ok){pagesUrl=`https://${username}.github.io/${repoName}`;log(`GitHub Pages: ${pagesUrl}`,'ok');}
+        else log('GitHub Pages: skipped','warn');
+      }
+    }
+    if(deploy==='vercel'||deploy==='both'){
+      log('Deploying to Vercel...','info');
+      try{
+        const vfiles=[];
+        for(const f of files){const text=await toText(f);vfiles.push({file:f.name,data:text});}
+        if(!skip&&addReadme&&readme)vfiles.push({file:'README.md',data:readme});
+        if(vfiles.length===0){log('WARNING: No files to deploy','warn');}
+        const projectName=repoName||'my-app';
+        const url=vercelTeamId?`https://api.vercel.com/v13/deployments?teamId=${vercelTeamId}`:`https://api.vercel.com/v13/deployments`;
+        // プロジェクト名を指定することで既存プロジェクトに上書きデプロイ
+        const deployPayload={name:projectName,files:vfiles,projectSettings:{framework:null},target:'production'};
+        const vr=await fetch(url,{method:'POST',headers:{'Authorization':`Bearer ${vercelToken}`,'Content-Type':'application/json'},body:JSON.stringify(deployPayload)});
+        if(vr.ok){
+          const vd=await vr.json();
+          // 既存プロジェクトのURLを使用
+          vercelUrl=`https://${projectName}.vercel.app`;
+          log(`Vercel: ${vercelUrl}`,'ok');
+        }
+        else{const ve=await vr.json();log(`Vercel ERROR: ${ve.error?.message||'failed'}`,'err');}
+      }catch(e){log(`Vercel ERROR: ${e.message}`,'err');}
+    }
+    log('All done!','ok');
+    const rp=document.getElementById('resultPanel');rp.classList.add('show');
+    if(repoUrl){document.getElementById('r-repo').style.display='block';const a=document.getElementById('r-repo-url');a.textContent=repoUrl;a.href=repoUrl;}
+    if(pagesUrl){document.getElementById('r-pages').style.display='block';const a=document.getElementById('r-pages-url');a.textContent=pagesUrl;a.href=pagesUrl;}
+    if(vercelUrl){document.getElementById('r-vercel').style.display='block';const a=document.getElementById('r-vercel-url');a.textContent=vercelUrl;a.href=vercelUrl;}
+  }catch(e){log(`ERROR: ${e.message}`,'err');}
+  btn.disabled=false;
+}
+</script>
+</body>
+</html>
